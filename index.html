@@ -2310,12 +2310,10 @@ function renderTable() {
     return;
   }
 
-  const now = Date.now();
-  const oneDayMs = 24 * 60 * 60 * 1000;
+  const latestDay = latestSavedDay();
 
   tbody.innerHTML = pageRows.map((r, i) => {
-    const savedTime = new Date(r.savedAt || r.recvDate || 0).getTime();
-    const isNew = (now - savedTime) < oneDayMs;
+    const isNew = isNewRecord(r, latestDay);
     const isLastNew = r.id == state.lastNewId;
     return `
       <tr class="${isLastNew ? 'flash-new' : ''}">
@@ -2332,6 +2330,22 @@ function renderTable() {
         </td>
       </tr>`;
   }).join('');
+}
+
+// ========== ป้าย NEW: หนังสือทุกฉบับที่บันทึกใน "วันล่าสุดที่มีการบันทึก" (ตามเวลาไทย) ==========
+// ป้ายจะคงอยู่จนกว่าจะมีการบันทึกหนังสือในวันใหม่ — ทะเบียนจึงมีชุดหนังสือมาใหม่ให้เห็นเสมอ
+function bangkokDay(value) {
+  const d = new Date(value);
+  if (!value || isNaN(d)) return '';
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+}
+function latestSavedDay() {
+  let latest = '';
+  state.records.forEach(r => { const d = bangkokDay(r.savedAt); if (d > latest) latest = d; });
+  return latest;
+}
+function isNewRecord(r, latestDay) {
+  return Boolean(latestDay) && bangkokDay(r.savedAt) === latestDay;
 }
 
 // ========== PAGINATION (PUBLIC) ==========
@@ -2685,14 +2699,12 @@ function renderAdminTable() {
     return;
   }
 
-  const now = Date.now();
-  const oneDayMs = 24 * 60 * 60 * 1000;
+  const latestDay = latestSavedDay();
 
   tbody.innerHTML = state.adminFiltered.map((r, i) => {
     const groupClass = r.group === 'งานโรงเรียน' ? 'school' :
                        r.group === 'งานแผนงานและโครงการ' ? 'plan' : 'supervisor';
-    const savedTime = new Date(r.savedAt || r.recvDate || 0).getTime();
-    const isNew = (now - savedTime) < oneDayMs;
+    const isNew = isNewRecord(r, latestDay);
     const isLastNew = r.id == state.lastNewId;
     return `
       <tr class="${isLastNew ? 'flash-new' : ''}">
