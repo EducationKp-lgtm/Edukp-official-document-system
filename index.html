@@ -1178,11 +1178,12 @@ footer .copyright { opacity: 0.85; }
           ค้นหาและกรองข้อมูล
         </div>
       </div>
-      <div class="search-form-body">
+      <!-- autocomplete="off": กันเบราว์เซอร์กรอกชื่อผู้ใช้ที่จำไว้ลงช่องค้นหา -->
+      <form class="search-form-body" autocomplete="off" onsubmit="return false;">
         <div class="search-grid">
           <div class="search-item">
             <label>กลุ่มงาน</label>
-            <select id="filterGroup">
+            <select id="filterGroup" autocomplete="off">
               <option value="">ทั้งหมด</option>
               <option value="งานโรงเรียน">งานโรงเรียน</option>
               <option value="งานแผนงานและโครงการ">งานแผนงานและโครงการ</option>
@@ -1191,22 +1192,22 @@ footer .copyright { opacity: 0.85; }
           </div>
           <div class="search-item">
             <label>ค้นหาเลขที่หนังสือ</label>
-            <input type="text" id="searchDocNo" placeholder="เช่น ศธ 04001/ว123" onkeypress="if(event.key==='Enter') doSearch()">
+            <input type="text" id="searchDocNo" name="onelink-search-docno" autocomplete="off" placeholder="เช่น ศธ 04001/ว123" onkeypress="if(event.key==='Enter') doSearch()">
           </div>
           <div class="search-item">
             <label>ค้นหาชื่อหนังสือ</label>
-            <input type="text" id="searchTitle" placeholder="คำในชื่อเรื่อง" onkeypress="if(event.key==='Enter') doSearch()">
+            <input type="text" id="searchTitle" name="onelink-search-title" autocomplete="off" placeholder="คำในชื่อเรื่อง" onkeypress="if(event.key==='Enter') doSearch()">
           </div>
           <div class="search-item search-item-daterange">
             <label>ช่วงวันที่ลงรับ</label>
             <div class="daterange-wrap">
-              <input type="date" id="searchDateFrom" title="วันที่เริ่มต้น">
+              <input type="date" id="searchDateFrom" title="วันที่เริ่มต้น" autocomplete="off">
               <span class="daterange-sep">ถึง</span>
-              <input type="date" id="searchDateTo" title="วันที่สิ้นสุด">
+              <input type="date" id="searchDateTo" title="วันที่สิ้นสุด" autocomplete="off">
             </div>
           </div>
         </div>
-      </div>
+      </form>
       <div class="search-panel-footer">
         <div class="footer-note">
           <svg class="icon"><use href="#i-info"/></svg>
@@ -1373,10 +1374,10 @@ footer .copyright { opacity: 0.85; }
       <div class="panel-header" style="background: linear-gradient(to right, var(--admin-dark), var(--admin)); color: white;">
         <div class="panel-title" style="color: white;"><svg class="icon"><use href="#i-search"/></svg> ค้นหาและกรองข้อมูล (โหมดผู้ดูแล)</div>
       </div>
-      <div class="filter-body">
+      <form class="filter-body" autocomplete="off" onsubmit="return false;">
         <div class="input-group">
           <label>ค้นหา</label>
-          <input type="text" id="adminSearchInput" placeholder="ค้นหาเลขที่หนังสือ ชื่อเรื่อง หรือหน่วยงาน...">
+          <input type="text" id="adminSearchInput" name="onelink-admin-search" autocomplete="off" placeholder="ค้นหาเลขที่หนังสือ ชื่อเรื่อง หรือหน่วยงาน...">
         </div>
         <div class="input-group">
           <label>กลุ่มงาน</label>
@@ -1393,7 +1394,7 @@ footer .copyright { opacity: 0.85; }
             <option value="">-- ทุกปี --</option>
           </select>
         </div>
-      </div>
+      </form>
     </div>
 
     <div class="table-panel admin-table">
@@ -1435,14 +1436,15 @@ footer .copyright { opacity: 0.85; }
       <h3><svg class="icon"><use href="#i-lock"/></svg> เข้าสู่ระบบผู้ดูแล</h3>
       <button class="modal-close" onclick="closeLoginModal()">×</button>
     </div>
+    <form id="loginForm" onsubmit="event.preventDefault(); doLogin();">
     <div class="modal-body">
       <div class="form-group full" style="margin-bottom: 12px;">
-        <label>ชื่อผู้ใช้ <span class="req">*</span></label>
-        <input type="text" id="loginId" placeholder="ID">
+        <label for="loginId">ชื่อผู้ใช้ <span class="req">*</span></label>
+        <input type="text" id="loginId" name="username" autocomplete="username" placeholder="ID">
       </div>
       <div class="form-group full">
-        <label>รหัสผ่าน <span class="req">*</span></label>
-        <input type="password" id="loginPass" placeholder="Password" onkeypress="if(event.key==='Enter') doLogin()">
+        <label for="loginPass">รหัสผ่าน <span class="req">*</span></label>
+        <input type="password" id="loginPass" name="password" autocomplete="current-password" placeholder="Password">
       </div>
       <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); padding: 8px; background: var(--secondary); border-radius: 3px; display: flex; align-items: flex-start; gap: 6px;">
         <svg class="icon" style="margin-top:2px;"><use href="#i-info"/></svg>
@@ -1450,9 +1452,10 @@ footer .copyright { opacity: 0.85; }
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-default" onclick="closeLoginModal()">ยกเลิก</button>
-      <button class="btn-primary" onclick="doLogin()"><svg class="icon"><use href="#i-login"/></svg> เข้าสู่ระบบ</button>
+      <button type="button" class="btn-default" onclick="closeLoginModal()">ยกเลิก</button>
+      <button type="submit" class="btn-primary"><svg class="icon"><use href="#i-login"/></svg> เข้าสู่ระบบ</button>
     </div>
+    </form>
   </div>
 </div>
 
@@ -1463,7 +1466,7 @@ footer .copyright { opacity: 0.85; }
       <h3 id="formTitle"><svg class="icon"><use href="#i-plus"/></svg> บันทึกหนังสือราชการ</h3>
       <button class="modal-close" onclick="closeFormModal()">×</button>
     </div>
-    <div class="modal-body">
+    <form class="modal-body" autocomplete="off" onsubmit="return false;">
       <div class="form-grid">
         <div class="form-group">
           <label>กลุ่มงาน <span class="req">*</span></label>
@@ -1476,15 +1479,15 @@ footer .copyright { opacity: 0.85; }
         </div>
         <div class="form-group">
           <label>หน่วยงาน <span class="req">*</span></label>
-          <input type="text" id="fAgency" placeholder="เช่น สพป.เขต 1">
+          <input type="text" id="fAgency" autocomplete="off" placeholder="เช่น สพป.เขต 1">
         </div>
         <div class="form-group">
           <label>เลขที่หนังสือ <span class="req">*</span></label>
-          <input type="text" id="fDocNo" placeholder="เช่น ศธ 04001/ว123">
+          <input type="text" id="fDocNo" autocomplete="off" placeholder="เช่น ศธ 04001/ว123">
         </div>
         <div class="form-group">
           <label>ชื่อเรื่อง <span class="req">*</span></label>
-          <input type="text" id="fTitle" placeholder="เรื่อง...">
+          <input type="text" id="fTitle" autocomplete="off" placeholder="เรื่อง...">
         </div>
         <div class="form-group">
           <label>หนังสือลงวันที่ <span class="req">*</span></label>
@@ -1521,7 +1524,7 @@ footer .copyright { opacity: 0.85; }
           <div class="file-list" id="pdfList"></div>
         </div>
       </div>
-    </div>
+    </form>
     <div class="modal-footer">
       <button class="btn-default" onclick="closeFormModal()">ยกเลิก</button>
       <button class="btn-primary" id="btnSave" onclick="saveRecord()"><svg class="icon"><use href="#i-save"/></svg> บันทึกข้อมูล</button>
@@ -2459,6 +2462,13 @@ document.addEventListener('keydown', e => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+  const SEARCH_FIELDS = ['searchDocNo', 'searchTitle', 'searchDateFrom', 'searchDateTo', 'adminSearchInput'];
+  SEARCH_FIELDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  // ถ้าเบราว์เซอร์ยังแอบกรอกอัตโนมัติหลังโหลดหน้า ให้ล้างเฉพาะช่องที่ถูกกรอกอัตโนมัติ (ไม่ล้างสิ่งที่ผู้ใช้พิมพ์เอง)
+  setTimeout(() => SEARCH_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    try { if (el && el.matches(':-webkit-autofill')) el.value = ''; } catch (e) {}
+  }), 800);
   updateClock();
   updateUI();
   loadRecords();
