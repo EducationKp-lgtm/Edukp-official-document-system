@@ -1531,16 +1531,17 @@ footer .copyright { opacity: 0.85; }
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+// ความปลอดภัย: ไม่มี Login ID / รหัสผ่าน / ID ของชีทหรือโฟลเดอร์ในหน้าเว็บอีกต่อไป
+// การตรวจรหัสผ่านทำที่ Google Apps Script (ฝั่ง Server) ทั้งหมด
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbxLHKKJI48jFEv2HK9C3Wvev-Kw1GVZbqfVRKY25jV1Icd8KkvEVjJLGPNJXe9Wg8c/exec',
-  SHEET_ID: '13-c02TGJMb0KDPWoyznGXPrYdn2s8u8vK45BsqeuERs',
-  FOLDER_ID: '1458qCCEqEmJLdcljN6yguP4nYDW3fPU8',
-  ADMIN_ID: 'Education',
-  ADMIN_PASS: '321321'
+  API_URL: 'https://script.google.com/macros/s/AKfycbxLHKKJI48jFEv2HK9C3Wvev-Kw1GVZbqfVRKY25jV1Icd8KkvEVjJLGPNJXe9Wg8c/exec'
 };
+const SESSION_KEY = 'onelink_admin_session';
 
 let state = {
   isAdmin: false,
+  token: null,
+  adminId: '',
   currentPage: 'public',
   records: [], filtered: [], adminFiltered: [],
   editId: null, deleteId: null,
@@ -1550,6 +1551,17 @@ let state = {
 };
 
 function svgIcon(id) { return `<svg class="icon"><use href="#${id}"/></svg>`; }
+
+// กันการฝังสคริปต์ (XSS): ทุกข้อความที่มาจากข้อมูลต้องผ่าน esc() ก่อนแสดงผล
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function safeId(id) { return String(id ?? '').replace(/[^A-Za-z0-9-]/g, ''); }
+// อนุญาตเฉพาะลิงก์ Google Drive ที่ระบบสร้าง
+function safeDriveUrl(url) {
+  const u = String(url ?? '');
+  return /^https:\/\/drive\.google\.com\//.test(u) ? u : '';
+}
 
 function updateClock() {
   const now = new Date();
@@ -1565,7 +1577,7 @@ function showToast(title, msg, type = 'success') {
   const t = document.createElement('div');
   t.className = 'toast ' + type;
   const iconMap = { success: 'i-check-circle', error: 'i-x-circle', warn: 'i-warning', 'new-doc': 'i-bell' };
-  t.innerHTML = `<div class="toast-icon">${svgIcon(iconMap[type] || 'i-info')}</div><div style="flex:1;"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+  t.innerHTML = `<div class="toast-icon">${svgIcon(iconMap[type] || 'i-info')}</div><div style="flex:1;"><div class="toast-title">${esc(title)}</div><div class="toast-msg">${esc(msg)}</div></div>`;
   c.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
@@ -1580,7 +1592,7 @@ function toBuddhistDate(dateStr) {
   if (!dateStr) return '-';
   try {
     const d = new Date(dateStr);
-    if (isNaN(d)) return dateStr;
+    if (isNaN(d)) return esc(dateStr);
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear() + 543;
@@ -1630,24 +1642,77 @@ function closeLoginModal() {
   document.getElementById('loginId').value = '';
   document.getElementById('loginPass').value = '';
 }
-function doLogin() {
+let loginBusy = false;
+async function doLogin() {
+  if (loginBusy) return;
   const id = document.getElementById('loginId').value.trim();
   const pass = document.getElementById('loginPass').value;
-  if (id === CONFIG.ADMIN_ID && pass === CONFIG.ADMIN_PASS) {
-    state.isAdmin = true;
-    updateUI();
-    closeLoginModal();
-    showToast('เข้าสู่ระบบสำเร็จ', 'กำลังเข้าสู่หน้าผู้ดูแล...', 'success');
-    setTimeout(() => switchPage('admin'), 400);
-  } else {
-    showToast('เข้าสู่ระบบไม่สำเร็จ', 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+  if (!id || !pass) {
+    showToast('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน', 'warn');
+    return;
+  }
+  loginBusy = true;
+  showLoader('กำลังตรวจสอบสิทธิ์...');
+  try {
+    // ตรวจรหัสผ่านที่ Server เท่านั้น
+    const res = await apiCall('login', { id, password: pass });
+    if (res.success && res.token) {
+      setSession(res.token, res.adminId || id);
+      closeLoginModal();
+      showToast('เข้าสู่ระบบสำเร็จ', 'กำลังเข้าสู่หน้าผู้ดูแล...', 'success');
+      setTimeout(() => switchPage('admin'), 400);
+    } else {
+      showToast('เข้าสู่ระบบไม่สำเร็จ', res.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+    }
+  } catch (err) {
+    showToast('เข้าสู่ระบบไม่สำเร็จ', 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่', 'error');
+  } finally {
+    loginBusy = false;
+    hideLoader();
   }
 }
-function doLogout() {
-  state.isAdmin = false;
+function setSession(token, adminId) {
+  state.isAdmin = true;
+  state.token = token;
+  state.adminId = adminId;
+  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ token, adminId })); } catch (e) {}
   updateUI();
+}
+function clearSession() {
+  state.isAdmin = false;
+  state.token = null;
+  state.adminId = '';
+  try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+  updateUI();
+}
+// รีเฟรชหน้าเว็บแล้วยังอยู่ในโหมดผู้ดูแล (ภายในแท็บเดิม) ถ้า token ยังไม่หมดอายุ
+async function restoreSession() {
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch (e) {}
+  if (!saved || !saved.token) return;
+  try {
+    const res = await apiCall('checkSession', { _token: saved.token });
+    if (res.success) setSession(saved.token, res.adminId || saved.adminId);
+    else clearSession();
+  } catch (e) { /* เชื่อมต่อไม่ได้ชั่วคราว — คงสถานะผู้ชมทั่วไป */ }
+}
+// token หมดอายุหรือไม่ถูกต้อง → ออกจากโหมดผู้ดูแลและให้ล็อกอินใหม่
+function handleAuthExpired(res) {
+  if (res && res.code === 'AUTH_REQUIRED') {
+    clearSession();
+    switchPage('public');
+    showToast('หมดเวลาการเข้าสู่ระบบ', 'กรุณาเข้าสู่ระบบผู้ดูแลอีกครั้ง', 'warn');
+    openLoginModal();
+    return true;
+  }
+  return false;
+}
+function doLogout() {
+  const token = state.token;
+  clearSession();
   switchPage('public');
   showToast('ออกจากระบบ', 'ออกจากระบบเรียบร้อย', 'success');
+  if (token) apiCall('logout', { _token: token }).catch(() => {});
 }
 
 function updateUI() {
@@ -1662,13 +1727,13 @@ function updateUI() {
   if (state.isAdmin) {
     area.innerHTML = `
       <div class="user-info">
-        <div class="user-name">${svgIcon('i-user-shield')} ${CONFIG.ADMIN_ID}</div>
+        <div class="user-name">${svgIcon('i-user-shield')} ${esc(state.adminId)}</div>
         <div class="user-role">ผู้ดูแลระบบ</div>
       </div>
       <button class="btn-logout" onclick="doLogout()">${svgIcon('i-logout')} ออกจากระบบ</button>
     `;
     banner.classList.add('show');
-    document.getElementById('adminBannerUser').textContent = `เข้าสู่ระบบโดย: ${CONFIG.ADMIN_ID}`;
+    document.getElementById('adminBannerUser').textContent = `เข้าสู่ระบบโดย: ${state.adminId}`;
     
     // Add admin nav item
     const adminNav = document.createElement('button');
@@ -1684,6 +1749,7 @@ function updateUI() {
 
 // ========== API ==========
 async function apiCall(action, data = {}) {
+  if (['create', 'update', 'delete'].includes(action)) data = { ...data, _token: state.token };
   const formData = new FormData();
   formData.append('action', action);
   formData.append('data', JSON.stringify(data));
@@ -1756,7 +1822,7 @@ function previewFiles(type) {
     const list = document.getElementById('pdfList');
     list.innerHTML = file ? `
       <div class="file-item">
-        <span class="name">${svgIcon('i-pdf')} ${file.name} (${(file.size/1024).toFixed(1)} KB)</span>
+        <span class="name">${svgIcon('i-pdf')} ${esc(file.name)} (${(file.size/1024).toFixed(1)} KB)</span>
         <button onclick="removeFile('pdf')">×</button>
       </div>` : '';
   }
@@ -1766,7 +1832,7 @@ function previewImgList() {
   const list = document.getElementById('imgList');
   list.innerHTML = state.selectedImages.map((f, i) => `
     <div class="file-item">
-      <span class="name">${svgIcon('i-image')} ${f.name} (${(f.size/1024).toFixed(1)} KB)</span>
+      <span class="name">${svgIcon('i-image')} ${esc(f.name)} (${(f.size/1024).toFixed(1)} KB)</span>
       <button onclick="removeFile('img', ${i})">×</button>
     </div>`).join('');
 }
@@ -1783,7 +1849,7 @@ function removeFile(type, index) {
 }
 
 async function saveRecord() {
-  if (!state.isAdmin) return;
+  if (!state.isAdmin || !state.token) return;
   
   const group = document.getElementById('fGroup').value;
   const agency = document.getElementById('fAgency').value.trim();
@@ -1838,6 +1904,8 @@ async function saveRecord() {
       }
       closeFormModal();
       await loadRecords();
+    } else if (handleAuthExpired(res)) {
+      closeFormModal();
     } else { throw new Error(res.message || 'บันทึกไม่สำเร็จ'); }
   } catch (err) {
     showToast('เกิดข้อผิดพลาด', err.message, 'error');
@@ -1853,23 +1921,25 @@ function openViewModal(id) {
   if (!r) return;
   const groupClass = r.group === 'งานโรงเรียน' ? 'school' :
                      r.group === 'งานแผนงานและโครงการ' ? 'plan' : 'supervisor';
-  const images = r.images || [];
-  const pdfUrl = r.pdfUrl || '';
+  const images = (Array.isArray(r.images) ? r.images : [])
+    .map(img => ({ url: safeDriveUrl(img && (img.url || img)), thumb: safeDriveUrl(img && (img.thumb || img.url || img)) }))
+    .filter(img => img.url);
+  const pdfUrl = safeDriveUrl(r.pdfUrl);
 
   document.getElementById('viewBody').innerHTML = `
     <table class="detail-table">
-      <tr><td class="label">กลุ่มงาน</td><td><span class="tag ${groupClass}">${r.group || '-'}</span></td></tr>
-      <tr><td class="label">เลขที่หนังสือ</td><td><strong>${r.docNo || '-'}</strong></td></tr>
-      <tr><td class="label">ชื่อเรื่อง</td><td><strong>${r.title || '-'}</strong></td></tr>
-      <tr><td class="label">หน่วยงาน</td><td>${r.agency || '-'}</td></tr>
+      <tr><td class="label">กลุ่มงาน</td><td><span class="tag ${groupClass}">${esc(r.group || '-')}</span></td></tr>
+      <tr><td class="label">เลขที่หนังสือ</td><td><strong>${esc(r.docNo || '-')}</strong></td></tr>
+      <tr><td class="label">ชื่อเรื่อง</td><td><strong>${esc(r.title || '-')}</strong></td></tr>
+      <tr><td class="label">หน่วยงาน</td><td>${esc(r.agency || '-')}</td></tr>
       <tr><td class="label">หนังสือลงวันที่</td><td>${toBuddhistDate(r.docDate)}</td></tr>
       <tr><td class="label">วันที่ลงรับ</td><td>${toBuddhistDate(r.recvDate)}</td></tr>
       <tr><td class="label">บันทึกเข้าระบบเมื่อ</td><td>${r.savedAt ? new Date(r.savedAt).toLocaleString('th-TH') : '-'}</td></tr>
-      ${pdfUrl ? `<tr><td class="label">ไฟล์ PDF</td><td><a href="${pdfUrl}" target="_blank">${svgIcon('i-pdf')} ดาวน์โหลด PDF</a></td></tr>` : ''}
+      ${pdfUrl ? `<tr><td class="label">ไฟล์ PDF</td><td><a href="${esc(pdfUrl)}" target="_blank" rel="noopener">${svgIcon('i-pdf')} ดาวน์โหลด PDF</a></td></tr>` : ''}
       ${images.length ? `
       <tr><td class="label">รูปภาพ (${images.length})</td><td>
         <div class="img-grid">
-          ${images.map(img => `<a href="${img.url || img}" target="_blank"><img src="${img.thumb || img.url || img}" alt=""></a>`).join('')}
+          ${images.map(img => `<a href="${esc(img.url)}" target="_blank" rel="noopener"><img src="${esc(img.thumb)}" alt=""></a>`).join('')}
         </div>
       </td></tr>` : ''}
     </table>`;
@@ -1905,6 +1975,8 @@ async function confirmDelete() {
       showToast('ลบสำเร็จ', 'ลบรายการเรียบร้อยแล้ว', 'success');
       closeDeleteModal();
       await loadRecords();
+    } else if (handleAuthExpired(res)) {
+      closeDeleteModal();
     } else { throw new Error(res.message || 'ลบไม่สำเร็จ'); }
   } catch (err) {
     showToast('เกิดข้อผิดพลาด', err.message, 'error');
@@ -1948,13 +2020,13 @@ function renderTable() {
     return `
       <tr class="${isLastNew ? 'flash-new' : ''}">
         <td class="center">${i + 1}</td>
-        <td>${r.agency || '-'}</td>
-        <td><strong>${r.docNo || '-'}</strong></td>
-        <td>${r.title || '-'}${isNew ? '<span class="badge-new">NEW</span>' : ''}</td>
+        <td>${esc(r.agency || '-')}</td>
+        <td><strong>${esc(r.docNo || '-')}</strong></td>
+        <td>${esc(r.title || '-')}${isNew ? '<span class="badge-new">NEW</span>' : ''}</td>
         <td class="center">${toBuddhistDate(r.docDate)}</td>
         <td class="center">${toBuddhistDate(r.recvDate)}</td>
         <td class="center">
-          <button class="btn-view-detail" onclick="openViewModal('${r.id}')" title="ดูรายละเอียด">
+          <button class="btn-view-detail" onclick="openViewModal('${safeId(r.id)}')" title="ดูรายละเอียด">
             ${svgIcon('i-eye')} ดูข้อมูล
           </button>
         </td>
@@ -2012,17 +2084,17 @@ function renderAdminTable() {
     return `
       <tr class="${isLastNew ? 'flash-new' : ''}">
         <td class="center">${i + 1}</td>
-        <td><span class="tag ${groupClass}">${r.group || '-'}</span></td>
-        <td><strong>${r.docNo || '-'}</strong></td>
-        <td>${r.title || '-'}${isNew ? '<span class="badge-new">NEW</span>' : ''}</td>
-        <td>${r.agency || '-'}</td>
+        <td><span class="tag ${groupClass}">${esc(r.group || '-')}</span></td>
+        <td><strong>${esc(r.docNo || '-')}</strong></td>
+        <td>${esc(r.title || '-')}${isNew ? '<span class="badge-new">NEW</span>' : ''}</td>
+        <td>${esc(r.agency || '-')}</td>
         <td class="center">${toBuddhistDate(r.docDate)}</td>
         <td class="center">${toBuddhistDate(r.recvDate)}</td>
         <td class="center">
           <div class="act-btns" style="justify-content: center;">
-            <button class="btn-act view" onclick="openViewModal('${r.id}')" title="ดูรายละเอียด">${svgIcon('i-eye')}</button>
-            <button class="btn-act edit" onclick="editRecord('${r.id}')" title="แก้ไข">${svgIcon('i-pen')}</button>
-            <button class="btn-act del" onclick="openDeleteModal('${r.id}')" title="ลบ">${svgIcon('i-trash')}</button>
+            <button class="btn-act view" onclick="openViewModal('${safeId(r.id)}')" title="ดูรายละเอียด">${svgIcon('i-eye')}</button>
+            <button class="btn-act edit" onclick="editRecord('${safeId(r.id)}')" title="แก้ไข">${svgIcon('i-pen')}</button>
+            <button class="btn-act del" onclick="openDeleteModal('${safeId(r.id)}')" title="ลบ">${svgIcon('i-trash')}</button>
           </div>
         </td>
       </tr>`;
@@ -2196,9 +2268,9 @@ function renderSearchResults(results, params) {
 
   // สร้างข้อความแสดงเงื่อนไขที่ค้นหา
   const conditions = [];
-  if (params.docNo) conditions.push(`เลขที่: <span class="state-keyword">${params.docNo}</span>`);
-  if (params.title) conditions.push(`ชื่อเรื่อง: <span class="state-keyword">${params.title}</span>`);
-  if (params.g) conditions.push(`กลุ่มงาน: <span class="state-keyword">${params.g}</span>`);
+  if (params.docNo) conditions.push(`เลขที่: <span class="state-keyword">${esc(params.docNo)}</span>`);
+  if (params.title) conditions.push(`ชื่อเรื่อง: <span class="state-keyword">${esc(params.title)}</span>`);
+  if (params.g) conditions.push(`กลุ่มงาน: <span class="state-keyword">${esc(params.g)}</span>`);
   if (params.dFrom || params.dTo) {
     const fromStr = params.dFrom ? toBuddhistDate(params.dFrom) : '...';
     const toStr = params.dTo ? toBuddhistDate(params.dTo) : '...';
@@ -2247,13 +2319,13 @@ function renderSearchResults(results, params) {
             return `
               <tr>
                 <td class="center">${i + 1}</td>
-                <td>${r.agency || '-'}</td>
-                <td><strong>${r.docNo || '-'}</strong></td>
-                <td>${r.title || '-'}</td>
+                <td>${esc(r.agency || '-')}</td>
+                <td><strong>${esc(r.docNo || '-')}</strong></td>
+                <td>${esc(r.title || '-')}</td>
                 <td class="center">${toBuddhistDate(r.docDate)}</td>
                 <td class="center">${toBuddhistDate(r.recvDate)}</td>
                 <td class="center">
-                  <button class="btn-view-detail" onclick="openViewModal('${r.id}')" title="ดูรายละเอียด">
+                  <button class="btn-view-detail" onclick="openViewModal('${safeId(r.id)}')" title="ดูรายละเอียด">
                     ${svgIcon('i-eye')} ดูข้อมูล
                   </button>
                 </td>
@@ -2298,6 +2370,7 @@ window.addEventListener('DOMContentLoaded', () => {
   updateClock();
   updateUI();
   loadRecords();
+  restoreSession();
 });
 </script>
 
