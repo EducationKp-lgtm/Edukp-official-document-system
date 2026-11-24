@@ -28,8 +28,9 @@
   --warning-bg: #fef3c7;
   --info: #6b21a8;
   --info-bg: #f3e8ff;
-  --admin: #c9a961;
-  --admin-dark: #a08540;
+  --admin: #5b21b6;        /* หน้าผู้ดูแล: ม่วงเข้ม อ่านง่าย (เดิมสีทอง) */
+  --admin-dark: #3b0764;
+  --accent-gold: #c9a961;  /* ทองใช้เป็นเส้นเน้นเท่านั้น */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -100,7 +101,7 @@ body {
 .user-area { display: flex; align-items: center; gap: 12px; }
 .user-info { text-align: right; font-size: 12px; }
 .user-name { font-weight: 600; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
-.user-role { color: var(--admin-dark); font-size: 11px; font-weight: 500; }
+.user-role { color: var(--admin); font-size: 11px; font-weight: 500; }
 
 .btn-login {
   background: var(--primary);
@@ -154,14 +155,14 @@ body {
 .nav-item:hover { background: rgba(255,255,255,0.1); }
 .nav-item.active { background: var(--primary); border-bottom: 3px solid #c9a961; }
 .nav-item.admin-only {
-  background: linear-gradient(to right, rgba(201,169,97,0.2), rgba(201,169,97,0.1));
+  background: rgba(255,255,255,0.08);
   border-bottom: 3px solid transparent;
 }
-.nav-item.admin-only:hover { background: rgba(201,169,97,0.3); }
-.nav-item.admin-only.active { 
-  background: var(--admin); 
-  color: var(--primary-dark);
-  border-bottom: 3px solid white;
+.nav-item.admin-only:hover { background: rgba(255,255,255,0.16); }
+.nav-item.admin-only.active {
+  background: var(--admin);
+  color: white;
+  border-bottom: 3px solid var(--accent-gold);
   font-weight: 600;
 }
 
@@ -174,9 +175,10 @@ body {
   display: none;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid var(--admin-dark);
+  border-bottom: 2px solid var(--accent-gold);
 }
 .admin-banner.show { display: flex; }
+.admin-banner-pulse { background: var(--accent-gold) !important; }
 .admin-banner-left { display: flex; align-items: center; gap: 10px; }
 .admin-banner-pulse {
   width: 8px; height: 8px;
@@ -607,7 +609,9 @@ body {
   padding: 10px 14px;
   display: flex; justify-content: space-between; align-items: center;
 }
-.admin-table .table-toolbar { background: linear-gradient(to right, var(--admin-dark), var(--admin)); }
+.admin-table .table-toolbar { background: linear-gradient(to right, var(--admin-dark), var(--admin)); border-bottom: 3px solid var(--accent-gold); }
+.admin-panel-header { background: var(--admin-dark) !important; color: white; border-bottom: 3px solid var(--accent-gold) !important; }
+.admin-panel-header .panel-title { color: white !important; }
 .table-toolbar .title {
   font-size: 13px; font-weight: 600;
   display: flex; align-items: center; gap: 8px;
@@ -654,9 +658,10 @@ tbody tr.flash-new { animation: flashNew 4s ease-out; }
   font-weight: 500;
   border: 1px solid;
 }
-.tag.school { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-.tag.plan { background: var(--warning-bg); color: var(--warning); border-color: #fcd34d; }
-.tag.supervisor { background: #f3e8ff; color: #7c3aed; border-color: #d8b4fe; }
+.tag { white-space: nowrap; }
+.tag.school { background: #dbeafe; color: #1e6bb8; border-color: #93c5fd; }      /* งานโรงเรียน = น้ำเงิน */
+.tag.plan { background: #ffedd5; color: #c2410c; border-color: #fdba74; }        /* งานแผนงานฯ = ส้ม */
+.tag.supervisor { background: #d1fae5; color: #047857; border-color: #6ee7b7; }  /* งานศึกษานิเทศก์ = เขียว */
 
 .badge-new {
   display: inline-block;
@@ -685,9 +690,12 @@ tbody tr.flash-new { animation: flashNew 4s ease-out; }
   transition: all 0.15s;
 }
 .btn-act:hover { background: var(--secondary); }
-.btn-act.view:hover { border-color: var(--info); color: var(--info); }
-.btn-act.edit:hover { border-color: var(--warning); color: var(--warning); }
-.btn-act.del:hover { border-color: var(--danger); color: var(--danger); }
+.btn-act.view { color: var(--primary); border-color: #d8b4fe; }
+.btn-act.edit { color: #c2410c; border-color: #fdba74; }
+.btn-act.del { color: var(--danger); border-color: #fca5a5; }
+.btn-act.view:hover { background: #f3e8ff; border-color: var(--primary); }
+.btn-act.edit:hover { background: #ffedd5; border-color: #c2410c; }
+.btn-act.del:hover { background: var(--danger-bg); border-color: var(--danger); }
 
 /* ปุ่ม "ดูข้อมูล" ในตารางหน้าหลัก */
 .btn-view-detail {
@@ -1030,8 +1038,8 @@ footer .copyright { opacity: 0.85; }
   font-weight: 500;
   cursor: pointer;
 }
-.admin-tab:hover { background: #fffbeb; color: var(--admin-dark); }
-.admin-tab.active { background: var(--admin); color: white; font-weight: 600; border-color: var(--admin-dark); }
+.admin-tab:hover { background: var(--secondary); color: var(--admin); }
+.admin-tab.active { background: var(--admin); color: white; font-weight: 600; border-color: var(--admin-dark); box-shadow: inset 0 -3px 0 var(--accent-gold); }
 
 /* ========== รายงาน (ผู้ดูแล) ========== */
 .report-filter .filter-grid {
@@ -1462,16 +1470,6 @@ footer .copyright { opacity: 0.85; }
       <button type="button" class="admin-tab" data-admin-tab="adminVisits" onclick="switchPage('adminVisits')"><svg class="icon"><use href="#i-globe"/></svg> สถิติผู้เข้าชมเว็บไซต์</button>
     </div>
 
-    <div class="admin-notice">
-      <span class="admin-notice-icon"><svg class="icon"><use href="#i-shield"/></svg></span>
-      <div>
-        <strong>คุณกำลังอยู่ในหน้าผู้ดูแลระบบ</strong>
-        <div style="color: var(--text-soft); font-size: 12px; margin-top: 2px;">
-          ในหน้านี้คุณสามารถบันทึกหนังสือใหม่ แก้ไข และลบรายการได้ — เฉพาะหน้านี้เท่านั้น
-        </div>
-      </div>
-    </div>
-
     <div class="page-title admin-page">
       <h2><svg class="icon"><use href="#i-cog"/></svg> จัดการหนังสือราชการ</h2>
       <div class="right-actions">
@@ -1482,7 +1480,7 @@ footer .copyright { opacity: 0.85; }
     </div>
 
     <div class="filter-panel">
-      <div class="panel-header" style="background: linear-gradient(to right, var(--admin-dark), var(--admin)); color: white;">
+      <div class="panel-header admin-panel-header">
         <div class="panel-title" style="color: white;"><svg class="icon"><use href="#i-search"/></svg> ค้นหาและกรองข้อมูล (โหมดผู้ดูแล)</div>
       </div>
       <form class="filter-body" autocomplete="off" onsubmit="return false;">
@@ -1518,7 +1516,7 @@ footer .copyright { opacity: 0.85; }
           <thead>
             <tr>
               <th class="center" style="width:50px;">ลำดับ</th>
-              <th style="width:150px;">กลุ่มงาน</th>
+              <th style="width:165px;">กลุ่มงาน</th>
               <th style="width:140px;">เลขที่หนังสือ</th>
               <th>ชื่อเรื่อง</th>
               <th style="width:160px;">หน่วยงาน</th>
@@ -1534,6 +1532,10 @@ footer .copyright { opacity: 0.85; }
             </td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="pagination-bar" id="adminTablePagination" style="display:none;">
+        <div class="pagination-info" id="adminPaginationInfo"></div>
+        <div class="pagination" id="adminPaginationButtons" role="navigation" aria-label="เลือกหน้ารายการหนังสือ (ผู้ดูแล)"></div>
       </div>
     </div>
   </div>
@@ -1556,7 +1558,7 @@ footer .copyright { opacity: 0.85; }
     </div>
 
     <div class="filter-panel report-filter">
-      <div class="panel-header" style="background: linear-gradient(to right, var(--admin-dark), var(--admin)); color: white;">
+      <div class="panel-header admin-panel-header">
         <div class="panel-title" style="color: white;"><svg class="icon"><use href="#i-calendar"/></svg> เลือกช่วงเวลาของรายงาน</div>
       </div>
       <form class="filter-grid" autocomplete="off" onsubmit="return false;">
@@ -1617,7 +1619,7 @@ footer .copyright { opacity: 0.85; }
     </div>
 
     <div class="filter-panel report-filter">
-      <div class="panel-header" style="background: linear-gradient(to right, var(--admin-dark), var(--admin)); color: white;">
+      <div class="panel-header admin-panel-header">
         <div class="panel-title" style="color: white;"><svg class="icon"><use href="#i-calendar"/></svg> เลือกช่วงเวลาของรายงาน</div>
       </div>
       <form class="filter-grid" autocomplete="off" onsubmit="return false;">
@@ -1829,6 +1831,7 @@ let state = {
   pieChart: null, barChart: null,
   lastNewId: null,
   publicPage: 1,
+  adminPage: 1,
   reportCharts: {}
 };
 const VISIT_KEY = 'onelink_last_visit';
@@ -1836,6 +1839,7 @@ const TH_MONTHS = ['มกราคม','กุมภาพันธ์','มี
 const TH_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const GROUP_COLORS = { 'งานโรงเรียน': '#1e6bb8', 'งานแผนงานและโครงการ': '#c2410c', 'งานศึกษานิเทศก์': '#047857' };
 const PUBLIC_PAGE_SIZE = 20; // ทะเบียนหนังสือหน้าหลัก แสดงหน้าละ 20 รายการ
+const ADMIN_PAGE_SIZE = 30;  // รายการในหน้าผู้ดูแล แสดงหน้าละ 30 รายการ
 
 function svgIcon(id) { return `<svg class="icon"><use href="#${id}"/></svg>`; }
 
@@ -2056,7 +2060,7 @@ async function loadRecords() {
     if (res.success) {
       state.records = res.data || [];
       applyFilters();
-      applyAdminFilters();
+      applyAdminFilters(false);
       updateStats();
       updateCharts();
       buildYearFilter();
@@ -2193,6 +2197,7 @@ async function saveRecord() {
       }
       if (!state.editId && res.id) {
         state.lastNewId = res.id;
+        state.adminPage = 1; // หนังสือใหม่อยู่บนสุดของหน้า 1
         setTimeout(() => { showToast('หนังสือใหม่!', title, 'new-doc'); }, 600);
       }
       closeFormModal();
@@ -2299,7 +2304,7 @@ function renderTable() {
   state.publicPage = Math.min(Math.max(1, state.publicPage), totalPages);
   const offset = (state.publicPage - 1) * PUBLIC_PAGE_SIZE;
   const pageRows = state.filtered.slice(offset, offset + PUBLIC_PAGE_SIZE);
-  renderPagination(totalPages, offset, pageRows.length);
+  renderPagination('public', totalPages, offset, pageRows.length);
 
   if (!state.filtered.length) {
     tbody.innerHTML = `
@@ -2361,30 +2366,38 @@ function pageNumbers(current, total) {
   return out;
 }
 
-function renderPagination(totalPages, offset, shown) {
-  const bar = document.getElementById('tablePagination');
-  const total = state.filtered.length;
+// ตั้งค่าตัวแบ่งหน้า: public = ทะเบียนหน้าหลัก (20/หน้า), admin = รายการผู้ดูแล (30/หน้า)
+const PAGERS = {
+  public: { pageKey: 'publicPage', list: () => state.filtered, bar: 'tablePagination', info: 'paginationInfo', buttons: 'paginationButtons', tbody: 'tableBody', render: () => renderTable() },
+  admin: { pageKey: 'adminPage', list: () => state.adminFiltered, bar: 'adminTablePagination', info: 'adminPaginationInfo', buttons: 'adminPaginationButtons', tbody: 'adminTableBody', render: () => renderAdminTable() }
+};
+
+function renderPagination(name, totalPages, offset, shown) {
+  const cfg = PAGERS[name];
+  const bar = document.getElementById(cfg.bar);
+  const total = cfg.list().length;
   if (!total) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
-  document.getElementById('paginationInfo').textContent =
-    `แสดงรายการที่ ${offset + 1}–${offset + shown} จากทั้งหมด ${total} รายการ (หน้า ${state.publicPage}/${totalPages})`;
-  const cur = state.publicPage;
+  const cur = state[cfg.pageKey];
+  document.getElementById(cfg.info).textContent =
+    `แสดงรายการที่ ${offset + 1}–${offset + shown} จากทั้งหมด ${total} รายการ (หน้า ${cur}/${totalPages})`;
   const btn = (label, page, opts = {}) =>
     `<button type="button" class="page-btn${opts.active ? ' active' : ''}" ${opts.disabled ? 'disabled' : ''} ` +
-    `${opts.active ? 'aria-current="page"' : `onclick="goToPage(${page})"`} title="${opts.title || 'หน้า ' + page}">${label}</button>`;
+    `${opts.active ? 'aria-current="page"' : `onclick="goToPage('${name}', ${page})"`} title="${opts.title || 'หน้า ' + page}">${label}</button>`;
   let html = btn('‹<span class="pg-text"> ก่อนหน้า</span>', cur - 1, { disabled: cur === 1, title: 'หน้าก่อนหน้า' });
   pageNumbers(cur, totalPages).forEach(n => {
     html += n === '…' ? '<span class="page-gap">…</span>' : btn(n, n, { active: n === cur });
   });
   html += btn('<span class="pg-text">ถัดไป </span>›', cur + 1, { disabled: cur === totalPages, title: 'หน้าถัดไป' });
-  document.getElementById('paginationButtons').innerHTML = html;
+  document.getElementById(cfg.buttons).innerHTML = html;
 }
 
-function goToPage(page) {
-  state.publicPage = page;
-  renderTable();
-  // เลื่อนกลับไปหัวตารางทะเบียน เพื่อเริ่มอ่านรายการแรกของหน้าใหม่
-  const panel = document.getElementById('tableBody').closest('.table-panel');
+function goToPage(name, page) {
+  const cfg = PAGERS[name];
+  state[cfg.pageKey] = page;
+  cfg.render();
+  // เลื่อนกลับไปหัวตาราง เพื่อเริ่มอ่านรายการแรกของหน้าใหม่
+  const panel = document.getElementById(cfg.tbody).closest('.table-panel');
   if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -2662,7 +2675,9 @@ function trackVisit() {
 }
 
 // ========== FILTER & RENDER (ADMIN) ==========
-function applyAdminFilters() {
+function applyAdminFilters(resetPage = true) {
+  // เปลี่ยนเงื่อนไขค้นหา → กลับหน้า 1 / โหลดข้อมูลใหม่หลังแก้ไข-ลบ → อยู่หน้าเดิม
+  if (resetPage !== false) state.adminPage = 1;
   const q = document.getElementById('adminSearchInput').value.toLowerCase().trim();
   const g = document.getElementById('adminFilterGroup').value;
   const y = document.getElementById('adminFilterYear').value;
@@ -2690,6 +2705,12 @@ function renderAdminTable() {
   const tbody = document.getElementById('adminTableBody');
   document.getElementById('adminRecordCount').textContent = `${state.adminFiltered.length} รายการ`;
 
+  const totalPages = Math.max(1, Math.ceil(state.adminFiltered.length / ADMIN_PAGE_SIZE));
+  state.adminPage = Math.min(Math.max(1, state.adminPage), totalPages);
+  const offset = (state.adminPage - 1) * ADMIN_PAGE_SIZE;
+  const pageRows = state.adminFiltered.slice(offset, offset + ADMIN_PAGE_SIZE);
+  renderPagination('admin', totalPages, offset, pageRows.length);
+
   if (!state.adminFiltered.length) {
     tbody.innerHTML = `
       <tr><td colspan="8" class="empty-state">
@@ -2701,14 +2722,14 @@ function renderAdminTable() {
 
   const latestDay = latestSavedDay();
 
-  tbody.innerHTML = state.adminFiltered.map((r, i) => {
+  tbody.innerHTML = pageRows.map((r, i) => {
     const groupClass = r.group === 'งานโรงเรียน' ? 'school' :
                        r.group === 'งานแผนงานและโครงการ' ? 'plan' : 'supervisor';
     const isNew = isNewRecord(r, latestDay);
     const isLastNew = r.id == state.lastNewId;
     return `
       <tr class="${isLastNew ? 'flash-new' : ''}">
-        <td class="center">${i + 1}</td>
+        <td class="center">${offset + i + 1}</td>
         <td><span class="tag ${groupClass}">${esc(r.group || '-')}</span></td>
         <td><strong>${esc(r.docNo || '-')}</strong></td>
         <td>${esc(r.title || '-')}${isNew ? '<span class="badge-new">NEW</span>' : ''}</td>
