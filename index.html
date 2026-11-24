@@ -1005,6 +1005,111 @@ footer .copyright { opacity: 0.85; }
   .container { padding: 12px; }
 }
 
+/* ========== เมนูย่อยผู้ดูแล ========== */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  background: white;
+  border: 1px solid var(--border);
+  border-bottom: 3px solid var(--admin);
+  border-radius: 3px 3px 0 0;
+  padding: 6px 6px 0;
+  margin-bottom: 14px;
+}
+.admin-tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.admin-tab:hover { background: #fffbeb; color: var(--admin-dark); }
+.admin-tab.active { background: var(--admin); color: white; font-weight: 600; border-color: var(--admin-dark); }
+
+/* ========== รายงาน (ผู้ดูแล) ========== */
+.report-filter .filter-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 12px 16px;
+  align-items: end;
+  padding: 14px;
+}
+.report-filter .period-fields { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.report-filter .period-fields .input-group { min-width: 120px; }
+.report-filter .range-sep { font-size: 12px; color: var(--text-muted); padding-bottom: 8px; }
+.report-filter .report-actions { display: flex; gap: 8px; }
+.btn-print {
+  background: white; color: var(--primary-dark);
+  border: 1px solid var(--primary);
+  padding: 7px 16px; border-radius: 3px;
+  font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+  display: flex; align-items: center; gap: 6px; height: 34px;
+}
+.btn-print:hover { background: var(--secondary); }
+.report-filter .btn-primary { height: 34px; }
+
+.report-sheet {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 24px 28px;
+}
+.report-head { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 18px; }
+.report-head h2 { font-size: 20px; color: var(--primary-dark); font-weight: 700; }
+.report-head .report-system { font-size: 14px; font-weight: 600; margin-top: 2px; }
+.report-head .report-period { font-size: 14px; margin-top: 6px; }
+.report-head .report-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.report-section { margin-bottom: 20px; break-inside: avoid; page-break-inside: avoid; }
+.report-section h3 { font-size: 14px; color: var(--primary-dark); font-weight: 700; margin-bottom: 10px; }
+.report-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.report-card { border: 1px solid var(--border); border-left: 5px solid var(--c, var(--primary)); border-radius: 3px; padding: 10px 12px; }
+.report-card .rc-label { font-size: 12px; color: var(--text-muted); }
+.report-card .rc-value { font-size: 24px; font-weight: 700; color: var(--c, var(--primary)); line-height: 1.2; }
+.report-card .rc-sub { font-size: 11px; color: var(--text-muted); }
+.report-charts { display: grid; grid-template-columns: 1fr 1.6fr; gap: 14px; }
+.report-chart-box { border: 1px solid var(--border); border-radius: 3px; padding: 10px; }
+.report-chart-box .rcb-title { font-size: 12px; font-weight: 600; color: var(--text-soft); margin-bottom: 6px; }
+.report-charts > * { min-width: 0; } /* ให้กราฟหดตามความกว้างกระดาษ/หน้าจอ ไม่ดันกล่องให้ล้น */
+.report-chart { position: relative; height: 260px; }
+.report-chart canvas { max-width: 100%; }
+.report-sheet { overflow: hidden; }
+.report-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.report-table th, .report-table td { border: 1px solid var(--border); padding: 6px 8px; }
+.report-table th { background: var(--secondary); color: var(--primary-dark); font-weight: 600; text-align: center; white-space: nowrap; }
+.report-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.report-table tr.total td { font-weight: 700; background: #faf7fd; }
+.report-note { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-top: 8px; }
+.report-empty { padding: 40px 20px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-dark); border-radius: 3px; }
+@media (max-width: 900px) {
+  .report-filter .filter-grid { grid-template-columns: 1fr; }
+  .report-cards { grid-template-columns: repeat(2, 1fr); }
+  .report-charts { grid-template-columns: 1fr; }
+  .report-sheet { padding: 14px; }
+}
+
+/* ========== พิมพ์ / บันทึก PDF: พิมพ์เฉพาะแผ่นรายงาน ========== */
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { background: white !important; height: auto; }
+  .main-header, .navbar, .admin-banner, .breadcrumb, .admin-tabs, .report-filter,
+  .toast-container, .loader-overlay, .modal-overlay, .no-print { display: none !important; }
+  .container { padding: 0 !important; max-width: none !important; }
+  .report-sheet { border: none !important; padding: 0 !important; }
+  .report-cards { grid-template-columns: repeat(4, 1fr) !important; }
+  .report-charts { grid-template-columns: 1fr 1.6fr !important; }
+  .report-chart { height: 230px; }
+  .report-chart canvas { width: 100% !important; }
+  .report-table { font-size: 11px; }
+}
+
 /* ========== PAGINATION (ทะเบียนหนังสือ หน้าละ 20 รายการ) ========== */
 .pagination-bar {
   display: flex;
@@ -1351,6 +1456,12 @@ footer .copyright { opacity: 0.85; }
       <span style="color: var(--admin-dark); font-weight: 600;">หน้าผู้ดูแลระบบ</span>
     </div>
 
+    <div class="admin-tabs" role="tablist" aria-label="เมนูผู้ดูแลระบบ">
+      <button type="button" class="admin-tab" data-admin-tab="admin" onclick="switchPage('admin')"><svg class="icon"><use href="#i-cog"/></svg> จัดการหนังสือราชการ</button>
+      <button type="button" class="admin-tab" data-admin-tab="adminDocReport" onclick="switchPage('adminDocReport')"><svg class="icon"><use href="#i-chart-column"/></svg> รายงานสถิติหนังสือราชการ</button>
+      <button type="button" class="admin-tab" data-admin-tab="adminVisits" onclick="switchPage('adminVisits')"><svg class="icon"><use href="#i-globe"/></svg> สถิติผู้เข้าชมเว็บไซต์</button>
+    </div>
+
     <div class="admin-notice">
       <span class="admin-notice-icon"><svg class="icon"><use href="#i-shield"/></svg></span>
       <div>
@@ -1425,6 +1536,129 @@ footer .copyright { opacity: 0.85; }
         </table>
       </div>
     </div>
+  </div>
+
+
+  <!-- ========== ADMIN: รายงานสถิติหนังสือราชการ ========== -->
+  <div class="page-view" id="page-adminDocReport">
+    <div class="breadcrumb">
+      <a onclick="switchPage('public')"><svg class="icon"><use href="#i-home"/></svg> หน้าหลัก</a>
+      <svg class="icon sep"><use href="#i-chevron-right"/></svg>
+      <a onclick="switchPage('admin')" style="color: var(--admin-dark);">หน้าผู้ดูแลระบบ</a>
+      <svg class="icon sep"><use href="#i-chevron-right"/></svg>
+      <span style="color: var(--admin-dark); font-weight: 600;">รายงานสถิติหนังสือราชการ</span>
+    </div>
+
+    <div class="admin-tabs" role="tablist" aria-label="เมนูผู้ดูแลระบบ">
+      <button type="button" class="admin-tab" data-admin-tab="admin" onclick="switchPage('admin')"><svg class="icon"><use href="#i-cog"/></svg> จัดการหนังสือราชการ</button>
+      <button type="button" class="admin-tab" data-admin-tab="adminDocReport" onclick="switchPage('adminDocReport')"><svg class="icon"><use href="#i-chart-column"/></svg> รายงานสถิติหนังสือราชการ</button>
+      <button type="button" class="admin-tab" data-admin-tab="adminVisits" onclick="switchPage('adminVisits')"><svg class="icon"><use href="#i-globe"/></svg> สถิติผู้เข้าชมเว็บไซต์</button>
+    </div>
+
+    <div class="filter-panel report-filter">
+      <div class="panel-header" style="background: linear-gradient(to right, var(--admin-dark), var(--admin)); color: white;">
+        <div class="panel-title" style="color: white;"><svg class="icon"><use href="#i-calendar"/></svg> เลือกช่วงเวลาของรายงาน</div>
+      </div>
+      <form class="filter-grid" autocomplete="off" onsubmit="return false;">
+        <div class="input-group">
+          <label for="docType">ประเภทช่วงเวลา</label>
+          <select id="docType" onchange="togglePeriodFields('doc')">
+            <option value="year">รายปี (ม.ค. – ธ.ค.)</option>
+            <option value="range">ช่วงเดือน</option>
+          </select>
+        </div>
+        <div class="period-fields">
+          <div class="input-group" id="docYearWrap">
+            <label for="docYear">ปี พ.ศ.</label>
+            <select id="docYear"></select>
+          </div>
+          <div class="input-group" data-range="doc" style="display:none;">
+            <label for="docFromMonth">ตั้งแต่เดือน</label>
+            <select id="docFromMonth"></select>
+          </div>
+          <div class="input-group" data-range="doc" style="display:none;">
+            <label for="docFromYear">ปี พ.ศ.</label>
+            <select id="docFromYear"></select>
+          </div>
+          <span class="range-sep" data-range="doc" style="display:none;">ถึง</span>
+          <div class="input-group" data-range="doc" style="display:none;">
+            <label for="docToMonth">ถึงเดือน</label>
+            <select id="docToMonth"></select>
+          </div>
+          <div class="input-group" data-range="doc" style="display:none;">
+            <label for="docToYear">ปี พ.ศ.</label>
+            <select id="docToYear"></select>
+          </div>
+        </div>
+        <div class="report-actions">
+          <button type="button" class="btn-primary" onclick="renderDocReport()"><svg class="icon"><use href="#i-search"/></svg> แสดงรายงาน</button>
+          <button type="button" class="btn-print" onclick="printReport()"><svg class="icon"><use href="#i-save"/></svg> พิมพ์ / บันทึก PDF</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="report-sheet" id="docReportSheet"></div>
+  </div>
+
+  <!-- ========== ADMIN: สถิติผู้เข้าชมเว็บไซต์ ========== -->
+  <div class="page-view" id="page-adminVisits">
+    <div class="breadcrumb">
+      <a onclick="switchPage('public')"><svg class="icon"><use href="#i-home"/></svg> หน้าหลัก</a>
+      <svg class="icon sep"><use href="#i-chevron-right"/></svg>
+      <a onclick="switchPage('admin')" style="color: var(--admin-dark);">หน้าผู้ดูแลระบบ</a>
+      <svg class="icon sep"><use href="#i-chevron-right"/></svg>
+      <span style="color: var(--admin-dark); font-weight: 600;">สถิติผู้เข้าชมเว็บไซต์</span>
+    </div>
+
+    <div class="admin-tabs" role="tablist" aria-label="เมนูผู้ดูแลระบบ">
+      <button type="button" class="admin-tab" data-admin-tab="admin" onclick="switchPage('admin')"><svg class="icon"><use href="#i-cog"/></svg> จัดการหนังสือราชการ</button>
+      <button type="button" class="admin-tab" data-admin-tab="adminDocReport" onclick="switchPage('adminDocReport')"><svg class="icon"><use href="#i-chart-column"/></svg> รายงานสถิติหนังสือราชการ</button>
+      <button type="button" class="admin-tab" data-admin-tab="adminVisits" onclick="switchPage('adminVisits')"><svg class="icon"><use href="#i-globe"/></svg> สถิติผู้เข้าชมเว็บไซต์</button>
+    </div>
+
+    <div class="filter-panel report-filter">
+      <div class="panel-header" style="background: linear-gradient(to right, var(--admin-dark), var(--admin)); color: white;">
+        <div class="panel-title" style="color: white;"><svg class="icon"><use href="#i-calendar"/></svg> เลือกช่วงเวลาของรายงาน</div>
+      </div>
+      <form class="filter-grid" autocomplete="off" onsubmit="return false;">
+        <div class="input-group">
+          <label for="visType">ประเภทช่วงเวลา</label>
+          <select id="visType" onchange="togglePeriodFields('vis')">
+            <option value="year">รายปี (ม.ค. – ธ.ค.)</option>
+            <option value="range">ช่วงเดือน</option>
+          </select>
+        </div>
+        <div class="period-fields">
+          <div class="input-group" id="visYearWrap">
+            <label for="visYear">ปี พ.ศ.</label>
+            <select id="visYear"></select>
+          </div>
+          <div class="input-group" data-range="vis" style="display:none;">
+            <label for="visFromMonth">ตั้งแต่เดือน</label>
+            <select id="visFromMonth"></select>
+          </div>
+          <div class="input-group" data-range="vis" style="display:none;">
+            <label for="visFromYear">ปี พ.ศ.</label>
+            <select id="visFromYear"></select>
+          </div>
+          <span class="range-sep" data-range="vis" style="display:none;">ถึง</span>
+          <div class="input-group" data-range="vis" style="display:none;">
+            <label for="visToMonth">ถึงเดือน</label>
+            <select id="visToMonth"></select>
+          </div>
+          <div class="input-group" data-range="vis" style="display:none;">
+            <label for="visToYear">ปี พ.ศ.</label>
+            <select id="visToYear"></select>
+          </div>
+        </div>
+        <div class="report-actions">
+          <button type="button" class="btn-primary" onclick="loadVisitReport()"><svg class="icon"><use href="#i-search"/></svg> แสดงรายงาน</button>
+          <button type="button" class="btn-print" onclick="printReport()"><svg class="icon"><use href="#i-save"/></svg> พิมพ์ / บันทึก PDF</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="report-sheet" id="visitReportSheet"></div>
   </div>
 
 </div>
@@ -1594,8 +1828,13 @@ let state = {
   selectedImages: [], selectedPdf: null,
   pieChart: null, barChart: null,
   lastNewId: null,
-  publicPage: 1
+  publicPage: 1,
+  reportCharts: {}
 };
+const VISIT_KEY = 'onelink_last_visit';
+const TH_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const TH_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const GROUP_COLORS = { 'งานโรงเรียน': '#1e6bb8', 'งานแผนงานและโครงการ': '#c2410c', 'งานศึกษานิเทศก์': '#047857' };
 const PUBLIC_PAGE_SIZE = 20; // ทะเบียนหนังสือหน้าหลัก แสดงหน้าละ 20 รายการ
 
 function svgIcon(id) { return `<svg class="icon"><use href="#${id}"/></svg>`; }
@@ -1659,7 +1898,8 @@ function fileToBase64(file) {
 
 // ========== PAGE SWITCH ==========
 function switchPage(page) {
-  if (page === 'admin' && !state.isAdmin) {
+  const isAdminPage = page.indexOf('admin') === 0;
+  if (isAdminPage && !state.isAdmin) {
     showToast('ไม่มีสิทธิ์', 'กรุณาเข้าสู่ระบบก่อนเข้าหน้าผู้ดูแล', 'warn');
     openLoginModal();
     return;
@@ -1670,13 +1910,17 @@ function switchPage(page) {
   
   // Update nav active state
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  if (page === 'admin') {
+  if (isAdminPage) {
     document.querySelector('.nav-item.admin-only')?.classList.add('active');
   } else {
-    document.querySelector('.nav-item[data-page="public"]')?.classList.add('active');
+    document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
   }
-  
+  // เมนูย่อยของผู้ดูแล
+  document.querySelectorAll('.admin-tab').forEach(el => el.classList.toggle('active', el.dataset.adminTab === page));
+
   if (page === 'admin') renderAdminTable();
+  else if (page === 'adminDocReport') { initPeriodFilter('doc'); renderDocReport(); }
+  else if (page === 'adminVisits') { initPeriodFilter('vis'); loadVisitReport(); }
   else renderTable();
 }
 
@@ -1797,7 +2041,7 @@ function updateUI() {
 
 // ========== API ==========
 async function apiCall(action, data = {}) {
-  if (['create', 'update', 'delete'].includes(action)) data = { ...data, _token: state.token };
+  if (['create', 'update', 'delete', 'visitStats'].includes(action)) data = { ...data, _token: state.token };
   const formData = new FormData();
   formData.append('action', action);
   formData.append('data', JSON.stringify(data));
@@ -1816,6 +2060,7 @@ async function loadRecords() {
       updateStats();
       updateCharts();
       buildYearFilter();
+      if (state.currentPage === 'adminDocReport') renderDocReport();
     } else { throw new Error(res.message || 'โหลดข้อมูลไม่สำเร็จ'); }
   } catch (err) {
     console.error(err);
@@ -2127,6 +2372,279 @@ function goToPage(page) {
   // เลื่อนกลับไปหัวตารางทะเบียน เพื่อเริ่มอ่านรายการแรกของหน้าใหม่
   const panel = document.getElementById('tableBody').closest('.table-panel');
   if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ========== รายงาน (ผู้ดูแล): ตัวเลือกช่วงเวลา ==========
+function pad2(n) { return String(n).padStart(2, '0'); }
+function lastDayOfMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+function todayBangkokIso() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+function thaiDateLong(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${TH_MONTHS[m - 1]} ${y + 543}`;
+}
+
+function initPeriodFilter(prefix) {
+  const yearSel = document.getElementById(prefix + 'Year');
+  if (yearSel.options.length) return; // ตั้งค่าแล้ว — คงค่าที่ผู้ใช้เลือกไว้
+  const nowY = Number(todayBangkokIso().slice(0, 4));
+  const nowM = Number(todayBangkokIso().slice(5, 7));
+  const years = new Set([nowY]);
+  for (let y = nowY - 5; y <= nowY; y++) years.add(y);
+  state.records.forEach(r => { const y = Number(String(r.recvDate || '').slice(0, 4)); if (y > 1900) years.add(y); });
+  const sorted = [...years].sort((a, b) => b - a);
+  const yearOpts = sorted.map(y => `<option value="${y}">${y + 543}</option>`).join('');
+  const monthOpts = TH_MONTHS.map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
+  ['Year', 'FromYear', 'ToYear'].forEach(k => { document.getElementById(prefix + k).innerHTML = yearOpts; });
+  ['FromMonth', 'ToMonth'].forEach(k => { document.getElementById(prefix + k).innerHTML = monthOpts; });
+  yearSel.value = nowY;
+  document.getElementById(prefix + 'FromYear').value = nowY;
+  document.getElementById(prefix + 'FromMonth').value = 1;
+  document.getElementById(prefix + 'ToYear').value = nowY;
+  document.getElementById(prefix + 'ToMonth').value = nowM;
+}
+
+function togglePeriodFields(prefix) {
+  const isRange = document.getElementById(prefix + 'Type').value === 'range';
+  document.getElementById(prefix + 'YearWrap').style.display = isRange ? 'none' : '';
+  document.querySelectorAll(`[data-range="${prefix}"]`).forEach(el => { el.style.display = isRange ? '' : 'none'; });
+}
+
+/** อ่านช่วงเวลาที่เลือก → { from, to, months[], label } หรือ { error } */
+function readPeriod(prefix) {
+  const type = document.getElementById(prefix + 'Type').value;
+  let fy, fm, ty, tm;
+  if (type === 'range') {
+    fy = Number(document.getElementById(prefix + 'FromYear').value);
+    fm = Number(document.getElementById(prefix + 'FromMonth').value);
+    ty = Number(document.getElementById(prefix + 'ToYear').value);
+    tm = Number(document.getElementById(prefix + 'ToMonth').value);
+  } else {
+    fy = ty = Number(document.getElementById(prefix + 'Year').value);
+    fm = 1; tm = 12;
+  }
+  const startIdx = fy * 12 + fm - 1, endIdx = ty * 12 + tm - 1;
+  if (endIdx < startIdx) return { error: 'เดือนเริ่มต้นต้องไม่อยู่หลังเดือนสิ้นสุด' };
+  if (endIdx - startIdx + 1 > 60) return { error: 'เลือกช่วงเวลาได้ไม่เกิน 60 เดือน' };
+  const months = [];
+  for (let i = startIdx; i <= endIdx; i++) months.push({ y: Math.floor(i / 12), m: (i % 12) + 1 });
+  const label = type === 'range'
+    ? `${TH_MONTHS[fm - 1]} ${fy + 543} – ${TH_MONTHS[tm - 1]} ${ty + 543}`
+    : `ปี พ.ศ. ${fy + 543} (มกราคม – ธันวาคม ${fy + 543})`;
+  return {
+    from: `${fy}-${pad2(fm)}-01`,
+    to: `${ty}-${pad2(tm)}-${pad2(lastDayOfMonth(ty, tm))}`,
+    months, label
+  };
+}
+
+function monthLabel(mo, many) { return `${TH_MONTHS_SHORT[mo.m - 1]} ${String(mo.y + 543).slice(-2)}`; }
+function monthKey(mo) { return `${mo.y}-${pad2(mo.m)}`; }
+function fmtNum(n) { return Number(n || 0).toLocaleString('th-TH'); }
+function pct(n, total) { return total ? (n / total * 100).toFixed(1) : '0.0'; }
+
+function reportHeader(title, period, extra) {
+  const today = thaiDateLong(todayBangkokIso()); // แสดงเฉพาะวันที่ ไม่แสดงเวลา
+  return `
+    <div class="report-head">
+      <h2>${esc(title)}</h2>
+      <div class="report-system">ระบบฐานข้อมูลหนังสือราชการออนไลน์ ฝ่ายบริหารการศึกษา (One-Link System)</div>
+      <div class="report-period">ช่วงเวลาของรายงาน: <strong>${esc(period.label)}</strong>${extra ? ' · ' + esc(extra) : ''}</div>
+      <div class="report-meta">จัดทำรายงานเมื่อ ${esc(today)} · โดย ฝ่ายบริหารการศึกษา</div>
+    </div>`;
+}
+
+function destroyReportCharts(keys) {
+  keys.forEach(k => { if (state.reportCharts[k]) { state.reportCharts[k].destroy(); delete state.reportCharts[k]; } });
+}
+
+const CHART_FONT = { family: 'Sarabun', size: 12 };
+
+// ========== รายงานสถิติหนังสือราชการ ==========
+function renderDocReport() {
+  const sheet = document.getElementById('docReportSheet');
+  const period = readPeriod('doc');
+  if (period.error) { showToast('ช่วงเวลาไม่ถูกต้อง', period.error, 'warn'); return; }
+  destroyReportCharts(['docPie', 'docBar']);
+
+  const groups = Object.keys(GROUP_COLORS);
+  const rows = state.records.filter(r => r.recvDate && r.recvDate >= period.from && r.recvDate <= period.to);
+  const total = rows.length;
+  const byGroup = Object.fromEntries(groups.map(g => [g, rows.filter(r => r.group === g).length]));
+  const byMonth = Object.fromEntries(period.months.map(mo => [monthKey(mo), Object.fromEntries(groups.map(g => [g, 0]))]));
+  rows.forEach(r => { const k = r.recvDate.slice(0, 7); if (byMonth[k] && byMonth[k][r.group] !== undefined) byMonth[k][r.group]++; });
+
+  const card = (label, value, color, sub) => `<div class="report-card" style="--c:${color}"><div class="rc-label">${esc(label)}</div><div class="rc-value">${fmtNum(value)}</div><div class="rc-sub">${esc(sub)}</div></div>`;
+  const tableRows = period.months.map(mo => {
+    const k = monthKey(mo); const t = groups.reduce((a, g) => a + byMonth[k][g], 0);
+    return `<tr><td>${TH_MONTHS[mo.m - 1]} ${mo.y + 543}</td>${groups.map(g => `<td class="num">${fmtNum(byMonth[k][g])}</td>`).join('')}<td class="num"><strong>${fmtNum(t)}</strong></td></tr>`;
+  }).join('');
+
+  sheet.innerHTML = reportHeader('รายงานสถิติหนังสือราชการ', period, 'นับตามวันที่ลงรับ') + `
+    <div class="report-section">
+      <h3>1. จำนวนหนังสือราชการ</h3>
+      <div class="report-cards">
+        ${card('หนังสือทั้งหมด', total, '#6b21a8', 'ฉบับ')}
+        ${groups.map(g => card(g, byGroup[g], GROUP_COLORS[g], `ฉบับ (ร้อยละ ${pct(byGroup[g], total)})`)).join('')}
+      </div>
+    </div>
+    ${total === 0 ? `<div class="report-empty">ไม่มีหนังสือราชการที่ลงรับในช่วงเวลานี้</div>` : `
+    <div class="report-section">
+      <h3>2. แผนภูมิ</h3>
+      <div class="report-charts">
+        <div class="report-chart-box"><div class="rcb-title">สัดส่วนตามกลุ่มงาน</div><div class="report-chart"><canvas id="docPieChart"></canvas></div></div>
+        <div class="report-chart-box"><div class="rcb-title">จำนวนหนังสือรายเดือน (แยกกลุ่มงาน)</div><div class="report-chart"><canvas id="docBarChart"></canvas></div></div>
+      </div>
+    </div>
+    <div class="report-section">
+      <h3>3. ตารางจำนวนหนังสือรายเดือน</h3>
+      <table class="report-table">
+        <thead><tr><th>เดือน</th>${groups.map(g => `<th>${esc(g)}</th>`).join('')}<th>รวม</th></tr></thead>
+        <tbody>${tableRows}
+          <tr class="total"><td>รวมทั้งสิ้น</td>${groups.map(g => `<td class="num">${fmtNum(byGroup[g])}</td>`).join('')}<td class="num">${fmtNum(total)}</td></tr>
+        </tbody>
+      </table>
+    </div>`}
+    <div class="report-note">หมายเหตุ: นับจากวันที่ลงรับของหนังสือแต่ละฉบับ · ข้อมูล ณ วันที่จัดทำรายงาน</div>`;
+
+  if (total === 0 || typeof Chart === 'undefined') return;
+  state.reportCharts.docPie = new Chart(document.getElementById('docPieChart'), {
+    type: 'doughnut',
+    data: { labels: groups, datasets: [{ data: groups.map(g => byGroup[g]), backgroundColor: groups.map(g => GROUP_COLORS[g]), borderWidth: 2, borderColor: '#fff' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false, cutout: '55%',
+      plugins: { legend: { position: 'bottom', labels: { font: CHART_FONT, padding: 10 } } } }
+  });
+  state.reportCharts.docBar = new Chart(document.getElementById('docBarChart'), {
+    type: 'bar',
+    data: { labels: period.months.map(mo => monthLabel(mo)), datasets: groups.map(g => ({ label: g, data: period.months.map(mo => byMonth[monthKey(mo)][g]), backgroundColor: GROUP_COLORS[g], stack: 'docs' })) },
+    options: { animation: false, responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: CHART_FONT, padding: 10 } } },
+      scales: { x: { stacked: true, ticks: { font: CHART_FONT }, grid: { display: false } }, y: { stacked: true, beginAtZero: true, ticks: { font: CHART_FONT, precision: 0 } } } }
+  });
+}
+
+// ========== สถิติผู้เข้าชมเว็บไซต์ ==========
+let visitReportSeq = 0;
+async function loadVisitReport() {
+  const sheet = document.getElementById('visitReportSheet');
+  const period = readPeriod('vis');
+  if (period.error) { showToast('ช่วงเวลาไม่ถูกต้อง', period.error, 'warn'); return; }
+  const seq = ++visitReportSeq;
+  destroyReportCharts(['visBar']);
+  sheet.innerHTML = `<div class="report-empty"><div class="empty-icon">${svgIcon('i-spinner')}</div>กำลังโหลดสถิติผู้เข้าชม...</div>`;
+  let res;
+  try { res = await apiCall('visitStats', { from: period.from, to: period.to }); }
+  catch (e) { res = { success: false, message: 'ไม่สามารถเชื่อมต่อระบบได้' }; }
+  if (seq !== visitReportSeq) return; // มีการเลือกช่วงเวลาใหม่ระหว่างรอ
+  if (!res.success) {
+    if (handleAuthExpired(res)) return;
+    sheet.innerHTML = `<div class="report-empty" style="color: var(--danger);">${esc(res.message || 'โหลดสถิติไม่สำเร็จ')}</div>`;
+    return;
+  }
+  renderVisitReport(period, res.data || [], res.startedAt || '');
+}
+
+function renderVisitReport(period, rows, startedAt) {
+  const sheet = document.getElementById('visitReportSheet');
+  const byMonth = Object.fromEntries(period.months.map(mo => [monthKey(mo), { sessions: 0, views: 0 }]));
+  let sessions = 0, views = 0, peak = null;
+  rows.forEach(r => {
+    const k = String(r.date).slice(0, 7);
+    if (!byMonth[k]) return;
+    byMonth[k].sessions += Number(r.sessions) || 0; byMonth[k].views += Number(r.views) || 0;
+    sessions += Number(r.sessions) || 0; views += Number(r.views) || 0;
+    if (!peak || r.sessions > peak.sessions) peak = r;
+  });
+  // จำนวนวันที่ใช้คิดค่าเฉลี่ย: ตั้งแต่วันเริ่มนับ (หรือต้นช่วง) ถึงวันนี้ (หรือท้ายช่วง)
+  const today = todayBangkokIso();
+  const start = startedAt && startedAt > period.from ? startedAt : period.from;
+  const end = today < period.to ? today : period.to;
+  const days = start <= end ? Math.round((Date.parse(end) - Date.parse(start)) / 864e5) + 1 : 0;
+  const avg = days > 0 && startedAt ? (sessions / days).toFixed(1) : '-';
+
+  const card = (label, value, color, sub) => `<div class="report-card" style="--c:${color}"><div class="rc-label">${esc(label)}</div><div class="rc-value">${value}</div><div class="rc-sub">${esc(sub)}</div></div>`;
+  const tableRows = period.months.map(mo => {
+    const v = byMonth[monthKey(mo)];
+    return `<tr><td>${TH_MONTHS[mo.m - 1]} ${mo.y + 543}</td><td class="num">${fmtNum(v.sessions)}</td><td class="num">${fmtNum(v.views)}</td></tr>`;
+  }).join('');
+  const startedNote = startedAt
+    ? `ระบบเริ่มนับสถิติผู้เข้าชมตั้งแต่วันที่ ${thaiDateLong(startedAt)} (ไม่มีข้อมูลก่อนวันดังกล่าว)`
+    : 'ยังไม่มีข้อมูลผู้เข้าชม (ระบบจะเริ่มนับเมื่อมีผู้เปิดเว็บไซต์หลังติดตั้งระบบนับสถิติ)';
+
+  sheet.innerHTML = reportHeader('รายงานจำนวนผู้เข้าชมเว็บไซต์', period) + `
+    <div class="report-section">
+      <h3>1. สรุปจำนวนผู้เข้าชม</h3>
+      <div class="report-cards">
+        ${card('ผู้เข้าชมทั้งหมด', fmtNum(sessions), '#6b21a8', 'ครั้ง')}
+        ${card('การเปิดหน้าเว็บทั้งหมด', fmtNum(views), '#1e6bb8', 'ครั้ง')}
+        ${card('เฉลี่ยผู้เข้าชมต่อวัน', avg, '#047857', days ? `จาก ${fmtNum(days)} วัน` : 'ครั้ง/วัน')}
+        ${card('วันที่มีผู้เข้าชมสูงสุด', peak ? fmtNum(peak.sessions) : '-', '#c2410c', peak ? thaiDateLong(peak.date) : 'ยังไม่มีข้อมูล')}
+      </div>
+    </div>
+    ${sessions + views === 0 ? `<div class="report-empty">ไม่มีข้อมูลผู้เข้าชมในช่วงเวลานี้</div>` : `
+    <div class="report-section">
+      <h3>2. แผนภูมิผู้เข้าชมรายเดือน</h3>
+      <div class="report-chart-box"><div class="report-chart"><canvas id="visBarChart"></canvas></div></div>
+    </div>
+    <div class="report-section">
+      <h3>3. ตารางผู้เข้าชมรายเดือน</h3>
+      <table class="report-table">
+        <thead><tr><th>เดือน</th><th>ผู้เข้าชม (ครั้ง)</th><th>การเปิดหน้าเว็บ (ครั้ง)</th></tr></thead>
+        <tbody>${tableRows}
+          <tr class="total"><td>รวมทั้งสิ้น</td><td class="num">${fmtNum(sessions)}</td><td class="num">${fmtNum(views)}</td></tr>
+        </tbody>
+      </table>
+    </div>`}
+    <div class="report-note no-print"><!-- แสดงบนหน้าจอเท่านั้น ไม่พิมพ์ลง PDF -->
+      วิธีนับ: ผู้เข้าชม 1 ครั้ง = การเปิดเว็บไซต์จากเบราว์เซอร์หนึ่ง ๆ โดยห่างจากการเปิดครั้งก่อนเกิน 30 นาที ·
+      การเปิดหน้าเว็บ = จำนวนครั้งที่โหลดหน้าเว็บทั้งหมด · ไม่นับการใช้งานขณะเข้าสู่ระบบผู้ดูแล ·
+      ไม่เก็บหมายเลข IP หรือข้อมูลส่วนบุคคล<br>${esc(startedNote)}
+    </div>`;
+
+  if (sessions + views === 0 || typeof Chart === 'undefined') return;
+  state.reportCharts.visBar = new Chart(document.getElementById('visBarChart'), {
+    type: 'bar',
+    data: { labels: period.months.map(mo => monthLabel(mo)), datasets: [
+      { label: 'ผู้เข้าชม (ครั้ง)', data: period.months.map(mo => byMonth[monthKey(mo)].sessions), backgroundColor: '#6b21a8' },
+      { label: 'การเปิดหน้าเว็บ (ครั้ง)', data: period.months.map(mo => byMonth[monthKey(mo)].views), backgroundColor: '#c9a961' }
+    ] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: CHART_FONT, padding: 10 } } },
+      scales: { x: { ticks: { font: CHART_FONT }, grid: { display: false } }, y: { beginAtZero: true, ticks: { font: CHART_FONT, precision: 0 } } } }
+  });
+}
+
+// ========== พิมพ์ / บันทึก PDF ==========
+function printReport() {
+  const page = state.currentPage;
+  const sheetId = page === 'adminVisits' ? 'visitReportSheet' : 'docReportSheet';
+  const sheet = document.getElementById(sheetId);
+  if (!sheet || !sheet.querySelector('.report-head')) {
+    showToast('ยังไม่มีรายงาน', 'กรุณากด "แสดงรายงาน" ก่อนพิมพ์', 'warn');
+    return;
+  }
+  window.print(); // ในหน้าต่างพิมพ์ เลือกเครื่องพิมพ์ หรือ "บันทึกเป็น PDF"
+}
+// ปรับขนาดกราฟให้พอดีกระดาษก่อนพิมพ์ และคืนขนาดหลังพิมพ์
+window.addEventListener('beforeprint', () => Object.values(state.reportCharts).forEach(c => c.resize()));
+window.addEventListener('afterprint', () => Object.values(state.reportCharts).forEach(c => c.resize()));
+try {
+  window.matchMedia('print').addEventListener('change', () => Object.values(state.reportCharts).forEach(c => c.resize()));
+} catch (e) {}
+
+// ========== นับผู้เข้าชมเว็บไซต์ (ไม่เก็บข้อมูลส่วนบุคคล) ==========
+function trackVisit() {
+  try { if (navigator.webdriver) return; } catch (e) {}           // ไม่นับโปรแกรมอัตโนมัติ
+  try { if (sessionStorage.getItem(SESSION_KEY)) return; } catch (e) {} // ไม่นับผู้ดูแลที่ล็อกอินอยู่
+  const now = Date.now();
+  let newSession = true;
+  try {
+    const last = Number(localStorage.getItem(VISIT_KEY) || 0);
+    newSession = !last || now - last > 30 * 60 * 1000;
+    localStorage.setItem(VISIT_KEY, String(now));
+  } catch (e) {}
+  apiCall('track', { newSession }).catch(() => {});
 }
 
 // ========== FILTER & RENDER (ADMIN) ==========
@@ -2471,6 +2989,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }), 800);
   updateClock();
   updateUI();
+  trackVisit();
   loadRecords();
   restoreSession();
 });
